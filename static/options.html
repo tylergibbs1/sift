@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sift Settings</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f2f2f7;
+      --group: #ffffff;
+      --label: #1d1d1f;
+      --secondary: rgb(60 60 67 / 0.6);
+      --separator: rgb(60 60 67 / 0.18);
+      --fill: rgb(120 120 128 / 0.16);
+      --tint: #007aff;
+      --on: #34c759;
+      --danger: #ff3b30;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #000000;
+        --group: #1c1c1e;
+        --label: #f5f5f7;
+        --secondary: rgb(235 235 245 / 0.6);
+        --separator: rgb(84 84 88 / 0.6);
+        --fill: rgb(120 120 128 / 0.32);
+        --tint: #0a84ff;
+        --on: #30d158;
+        --danger: #ff453a;
+      }
+    }
+    @media (prefers-contrast: more) {
+      :root { --secondary: var(--label); --separator: var(--label); }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; background: var(--bg); color: var(--label);
+      font: 100%/1.4 system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+    main { max-width: 640px; margin: 0 auto; padding: 3rem 1rem 4rem; }
+
+    header { padding: 0 1rem 1.5rem; }
+    h1 { margin: 0; font-size: 2.125rem; line-height: 1.1; font-weight: 700; letter-spacing: -0.02em; }
+    header p { margin: 0.375rem 0 0; color: var(--secondary); font-size: 0.9375rem; }
+
+    section { margin-top: 2.25rem; }
+    h2 {
+      margin: 0 1rem 0.4rem; font-size: 0.8125rem; font-weight: 400;
+      text-transform: uppercase; letter-spacing: 0.02em; color: var(--secondary);
+    }
+    .group { background: var(--group); border-radius: 12px; overflow: hidden; }
+    .footer { margin: 0.45rem 1rem 0; font-size: 0.8125rem; color: var(--secondary); }
+
+    .row {
+      position: relative; display: flex; align-items: center; gap: 1rem;
+      min-height: 2.75rem; padding: 0.5rem 1rem;
+    }
+    /* Inset hairline between rows, like a grouped list */
+    .row + .row::before {
+      content: ""; position: absolute; top: 0; left: 1rem; right: 0;
+      border-top: 0.5px solid var(--separator);
+    }
+    .row > label { flex: 1; font-size: 1.0625rem; letter-spacing: -0.01em; }
+    .row .sub { display: block; font-size: 0.8125rem; color: var(--secondary); letter-spacing: 0; }
+
+    input[type=password] {
+      flex: 1.6; min-width: 0; padding: 0; border: 0; outline: 0; background: transparent;
+      font: 1.0625rem/1.4 ui-monospace, "SF Mono", monospace; color: var(--label); text-align: right;
+    }
+    input[type=password]::placeholder { color: var(--secondary); font-family: system-ui, -apple-system, sans-serif; }
+
+    input[type=number] {
+      width: 4.5rem; padding: 0.3rem 0.5rem; border: 0; border-radius: 8px;
+      background: var(--fill); color: var(--label); text-align: right;
+      font: 1.0625rem/1.2 system-ui, -apple-system, sans-serif; font-variant-numeric: tabular-nums;
+    }
+    input:focus-visible { outline: 2px solid var(--tint); outline-offset: 2px; }
+    input[aria-invalid=true] { box-shadow: inset 0 0 0 1.5px var(--danger); }
+
+    /* Switch */
+    input[type=checkbox] {
+      appearance: none; flex: none; position: relative; margin: 0; cursor: pointer;
+      width: 51px; height: 31px; border-radius: 999px; background: var(--fill);
+      transition: background-color 200ms ease-out;
+    }
+    input[type=checkbox]::after {
+      content: ""; position: absolute; top: 2px; left: 2px;
+      width: 27px; height: 27px; border-radius: 50%; background: #fff;
+      box-shadow: 0 3px 8px rgb(0 0 0 / 0.15), 0 3px 1px rgb(0 0 0 / 0.06);
+      /* Critically damped: settles without overshoot */
+      transition: transform 280ms cubic-bezier(0.2, 0, 0, 1), width 120ms ease-out;
+    }
+    input[type=checkbox]:checked { background: var(--on); }
+    input[type=checkbox]:checked::after { transform: translateX(20px); }
+    /* The knob stretches on press, the instant the finger lands */
+    input[type=checkbox]:active::after { width: 33px; }
+    input[type=checkbox]:checked:active::after { transform: translateX(14px); }
+    @media (prefers-contrast: more) {
+      input[type=checkbox] { outline: 1px solid var(--label); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      input[type=checkbox], input[type=checkbox]::after { transition: none; }
+    }
+
+    .rule-kind { font-size: 0.9375rem; color: var(--secondary); }
+    .remove {
+      flex: none; height: 1.75rem; padding: 0 0.75rem; border: 0; border-radius: 999px; cursor: pointer;
+      font: 500 0.8125rem/1 system-ui, -apple-system, sans-serif;
+      color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, transparent);
+      transition: transform 100ms ease-out;
+    }
+    .remove:active { transform: scale(0.95); }
+    .remove:focus-visible { outline: 2px solid var(--tint); outline-offset: 2px; }
+    .empty { color: var(--secondary); font-size: 0.9375rem; }
+    .domain { flex: 1; min-width: 0; font-size: 1.0625rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    .error { margin: 0.45rem 1rem 0; font-size: 0.8125rem; color: var(--danger); }
+    .error:empty { display: none; }
+
+    .toast {
+      position: fixed; left: 50%; bottom: 1.5rem; translate: -50% 0;
+      padding: 0.5rem 1rem; border-radius: 999px;
+      font-size: 0.875rem; font-weight: 500;
+      color: var(--label); background: color-mix(in srgb, var(--group) 72%, transparent);
+      backdrop-filter: blur(24px) saturate(180%);
+      box-shadow: 0 0 0 0.5px var(--separator), 0 8px 24px rgb(0 0 0 / 0.12);
+      opacity: 0; transform: translateY(8px) scale(0.96);
+      transition: opacity 200ms ease-out, transform 300ms cubic-bezier(0.2, 0, 0, 1);
+      pointer-events: none;
+    }
+    .toast.shown { opacity: 1; transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .toast { transform: none; transition: opacity 150ms ease-out; }
+    }
+    @media (prefers-reduced-transparency: reduce) {
+      .toast { background: var(--group); backdrop-filter: none; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Sift</h1>
+    <p>Moves Google results that answer your question to the top and folds away sales pages and SEO filler.</p>
+  </header>
+
+  <section>
+    <h2>TypeSafe</h2>
+    <div class="group">
+      <div class="row">
+        <label for="apiKey">API Key</label>
+        <input id="apiKey" type="password" placeholder="Required" autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+    <p class="footer">Stored only on this device. It is never synced.</p>
+  </section>
+
+  <section>
+    <h2>Search Results</h2>
+    <div class="group">
+      <div class="row">
+        <label for="enabled">Re-rank Results</label>
+        <input id="enabled" type="checkbox" role="switch">
+      </div>
+      <div class="row">
+        <label for="showSummary">Show Changes<span class="sub">A note in the corner with “Show original”</span></label>
+        <input id="showSummary" type="checkbox" role="switch">
+      </div>
+      <div class="row">
+        <label for="hidePromotional">Hide Sales Pages</label>
+        <input id="hidePromotional" type="checkbox" role="switch">
+      </div>
+      <div class="row">
+        <label for="hideSeoFiller">Hide Listicles and SEO Filler</label>
+        <input id="hideSeoFiller" type="checkbox" role="switch">
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Site Rules</h2>
+    <div class="group" id="rules"></div>
+    <p class="footer">Add a rule from a result's badge or “Why here?” button, or right-click a result link. Rules apply instantly and don't use the API.</p>
+  </section>
+
+  <section>
+    <h2>Filter Sensitivity</h2>
+    <div class="group">
+      <div class="row">
+        <label for="flagThreshold">Flag At<span class="sub">How sure Sift must be that a page is sales or filler</span></label>
+        <input id="flagThreshold" type="number" min="0" max="1" step="0.05">
+      </div>
+      <div class="row">
+        <label for="hideMinConfidence">Hide At<span class="sub">Below this confidence, flagged pages are dimmed instead</span></label>
+        <input id="hideMinConfidence" type="number" min="0" max="1" step="0.05">
+      </div>
+    </div>
+    <p class="error" id="thresholdError" role="alert"></p>
+  </section>
+
+  <section>
+    <h2>Ranking Weights</h2>
+    <div class="group">
+      <div class="row"><label for="w-answersQuery">Answers the Question</label><input id="w-answersQuery" type="number" min="0" max="1" step="0.05"></div>
+      <div class="row"><label for="w-depth">Depth</label><input id="w-depth" type="number" min="0" max="1" step="0.05"></div>
+      <div class="row"><label for="w-notPromotional">Not Selling Something</label><input id="w-notPromotional" type="number" min="0" max="1" step="0.05"></div>
+      <div class="row"><label for="w-notSeoFiller">Not SEO Filler</label><input id="w-notSeoFiller" type="number" min="0" max="1" step="0.05"></div>
+      <div class="row"><label for="w-discussion">Forums and Q&amp;A<span class="sub">Raise to boost real discussions</span></label><input id="w-discussion" type="number" min="0" max="1" step="0.05"></div>
+    </div>
+    <p class="error" id="weightError" role="alert"></p>
+    <p class="footer">Each value is 0 to 1. Only their relative size matters. Changes apply on your next search.</p>
+  </section>
+</main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<script src="options.js"></script>
+</body>
+</html>

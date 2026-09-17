@@ -1,0 +1,22 @@
+{
+	"manifest_version": 3,
+	"name": "Sift",
+	"version": "0.1.0",
+	"description": "Moves Google results that answer your question to the top and folds away sales pages and SEO filler.",
+	"permissions": ["storage", "contextMenus"],
+	"host_permissions": ["https://api.typesafe.ai/*"],
+	"background": {
+		"service_worker": "background.js"
+	},
+	"content_scripts": [
+		{
+			"matches": ["https://www.google.com/search*"],
+			"js": ["content.js"],
+			"run_at": "document_idle"
+		}
+	],
+	"options_ui": {
+		"page": "options.html",
+		"open_in_tab": true
+	}
+}
