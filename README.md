@@ -1,11 +1,34 @@
 # Sift
 
+[![CI](https://github.com/tylergibbs1/sift/actions/workflows/ci.yml/badge.svg)](https://github.com/tylergibbs1/sift/actions/workflows/ci.yml)
+
 A Chrome extension (Manifest V3) that re-ranks Google results with [TypeSafe Jev](https://docs.typesafe.ai).
 It moves results that answer the query to the top. It folds away sales pages and SEO filler.
 
+## Quick start
+
+```sh
+npm install && npm run build   # outputs dist/
+```
+
+Load `dist/` as an unpacked extension in `chrome://extensions`, then enter your TypeSafe API key on
+the options page. Details are under [Setup](#setup).
+
+## Features
+
+- **Search intent.** Each search gets one extra question: is it transactional ("buy nike pegasus 41",
+  "pizza delivery near me")? If so, sales pages are not hidden and not penalized. A research search
+  like "best vpn" still filters them.
+- **Site rules.** Always boost or always hide a site. You can set a rule from a result's badge or its
+  "Why here?" button, or from the **Sift** right-click menu on a result link. Rules are synced
+  with `chrome.storage.sync` and apply without an API call. An open results page re-ranks as soon as a rule
+  changes. The settings page lists the rules and lets you remove them.
+- **"Why this rank?" popover.** Click a badge, or the "Why here?" button that appears when you hover over a
+  result. The popover shows every factor with its value and whether it raises or lowers the rank.
+
 ## How it works
 
-1. `content.ts` scrapes the organic results on `google.com/search`. Sponsored blocks are skipped.
+1. `src/content.ts` scrapes the organic results on `google.com/search`. Sponsored blocks are skipped.
 2. The service worker sends one Jev call per result, and all calls run at the same time. Each call asks five
    atomic questions (`src/rank/questions.ts`): four Noul questions (answers the query, promotional,
    SEO filler, discussion) and one Score question (depth, 0 to 3, normalized to 0 to 1).
@@ -21,18 +44,6 @@ It moves results that answer the query to the top. It folds away sales pages and
 5. `src/serp/toast.ts` shows a translucent panel in the corner when the page changed, for example
    "Reordered 3 · hid 2". Its **Show original** button restores Google's order exactly, and
    **Re-apply** reorders the results again.
-
-## Features
-
-- **Search intent.** Each search gets one extra question: is it transactional ("buy nike pegasus 41",
-  "pizza delivery near me")? If so, sales pages are not hidden and not penalized. A research search
-  like "best vpn" still filters them.
-- **Site rules.** Always boost or always hide a site. You can set a rule from a result's badge or its
-  "Why here?" button, or from the **Sift** right-click menu on a result link. Rules are synced
-  with `chrome.storage.sync` and apply without an API call. An open results page re-ranks as soon as a rule
-  changes. The settings page lists the rules and lets you remove them.
-- **"Why this rank?" popover.** Click a badge, or the "Why here?" button that appears when you hover over a
-  result. The popover shows every factor with its value and whether it raises or lowers the rank.
 
 The motion follows Apple's fluid-interface guidance:
 
